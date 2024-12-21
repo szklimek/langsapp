@@ -7,6 +7,8 @@ import com.langsapp.home.onboarding.UserProfileInfo
 
 sealed class HomeAction : Action {
     data object SkipTapped : HomeAction()
+    data object OnboardingRequiredSectionFinished : HomeAction()
+    data object OnboardingSignUpSectionFinished : HomeAction()
     data object SignUpTapped : HomeAction()
     data object SignUpFinished : HomeAction()
     data object UpsertProfileTapped : HomeAction()

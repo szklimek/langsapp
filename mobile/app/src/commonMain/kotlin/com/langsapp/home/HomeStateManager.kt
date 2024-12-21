@@ -124,6 +124,14 @@ class HomeStateManager(
             HomeAction.DevOptionsTapped -> ActionResult(
                 sideEffects = ArrayDeque(listOf(HomeNavigationSideEffect.DevOptions)),
             )
+
+            HomeAction.OnboardingRequiredSectionFinished -> ActionResult(
+                // TODO
+            )
+
+            HomeAction.OnboardingSignUpSectionFinished -> ActionResult(
+                TODO()
+            )
         }
     },
     handleSideEffect = { sideEffect ->
