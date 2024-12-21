@@ -4,6 +4,8 @@
     <string name="button_start">Start</string>
     <string name="button_skip">Skip</string>
     <string name="button_done">Done</string>
+    <string name="button_back">Back</string>
 
     <string name="toolbar_title_language_settings">Language settings</string>
+    <string name="toolbar_title_home">Langsapp</string>
 </resources>
