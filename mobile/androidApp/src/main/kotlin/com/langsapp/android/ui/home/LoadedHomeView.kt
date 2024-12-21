@@ -177,7 +177,16 @@ fun OnboardingSectionCard(
                     }
                 }
             }
-            Spacer(Modifier.height(4.dp))
+            Button(
+                onClick = {
+                    actionSender.sendAction(HomeAction.OnboardingSectionFinished)
+                },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp, horizontal = 16.dp)
+            ) {
+                Text(text = stringResource(R.string.button_finish))
+            }
         }
     }
 
