@@ -12,6 +12,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
@@ -62,7 +63,17 @@ internal fun InputScreen(
                         contentDescription = stringResource(R.string.button_done)
                     )
                 }
-            }
+            },
+            navigationIcon = {
+                IconButton(onClick = {
+                    actionSender.sendAction(LanguageSettingsAction.BackTapped)
+                }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.button_back)
+                    )
+                }
+            },
         )
         val chips = remember { state.availableLanguages.map { it.name } }
         Column(
