@@ -7,17 +7,10 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Done
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.CardElevation
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -28,7 +21,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.langsapp.android.app.R
-import com.langsapp.android.logging.Log
 import com.langsapp.architecture.Action
 import com.langsapp.architecture.ActionSender
 import com.langsapp.common.CommonResult
@@ -36,8 +28,6 @@ import com.langsapp.home.HomeAction
 import com.langsapp.home.HomeState
 import com.langsapp.home.onboarding.OnBoardingInfo
 import com.langsapp.home.onboarding.UserProfileInfo
-import com.langsapp.settings.language.LanguageSettingsAction
-import org.intellij.lang.annotations.JdkConstants.HorizontalAlignment
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -101,26 +91,40 @@ internal fun LoadedHomeView(
 
         Spacer(Modifier.height(8.dp))
 
-        if (onBoardingInfo is CommonResult.Success) {
-            if (!onBoardingInfo.value.isFinished) {
-                onBoardingInfo.value.sections.forEach { section ->
-                    OnboardingSectionCard(
-                        actionSender,
-                        section.childSteps.toMutableList().apply { add(0, section.rootStep) })
+        ElevatedCard(
+            elevation = CardDefaults.elevatedCardElevation(),
+            modifier = Modifier
+                .padding(16.dp)
+                .fillMaxWidth()
+        ) {
+            if (onBoardingInfo is CommonResult.Success) {
+                Row(verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    Text(
+                        text = "On-boarding completed: ${onBoardingInfo.value.isCompleted}",
+                        modifier = Modifier
+                            .padding(vertical = 16.dp, horizontal = 8.dp)
+                            .weight(3f)
+                    )
+                    if (onBoardingInfo.value.areRequiredStepsDone) {
+                        TextButton(onClick =
+                        {
+
+                        }, modifier = Modifier
+                            .weight(1f)) {
+                            Text(text = "Collapse")
+                        }
+                    }
                 }
+                onBoardingInfo.value.sections.forEachIndexed { index, section ->
+                    Spacer(Modifier.height(8.dp))
+                    StepInfoView2(actionSender, section.rootStep)
+                    section.childSteps.forEach { stepInfo -> StepInfoView2(actionSender, stepInfo) }
+                }
+            } else {
+                Text("Failed to load on-boarding info")
             }
-
-
-            Text("On-boarding finished: ${onBoardingInfo.value.isFinished}")
-            Text("On-boarding sections:")
-            onBoardingInfo.value.sections.forEachIndexed { index, section ->
-                Spacer(Modifier.height(8.dp))
-                Text("Section ${index + 1}: ${section.rootStep}")
-                StepInfoView(actionSender, section.rootStep)
-                section.childSteps.forEach { stepInfo -> StepInfoView(actionSender, stepInfo) }
-            }
-        } else {
-            Text("Failed to load on-boarding info")
         }
     }
 }
@@ -128,7 +132,7 @@ internal fun LoadedHomeView(
 @Composable
 fun OnboardingSectionCard(
     actionSender: ActionSender<Action>,
-    stepInfoList: List<OnBoardingInfo.StepInfo>,
+    stepInfoList: List<OnBoardingInfo.StepInfo>
 ) {
     ElevatedCard(
         elevation = CardDefaults.elevatedCardElevation(),
@@ -177,19 +181,56 @@ fun OnboardingSectionCard(
                     }
                 }
             }
-            Button(
-                onClick = {
-                    actionSender.sendAction(HomeAction.OnboardingSectionFinished)
-                },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 8.dp, horizontal = 16.dp)
-            ) {
-                Text(text = stringResource(R.string.button_finish))
-            }
         }
     }
 
+}
+
+@Composable
+fun StepInfoView2(
+    actionSender: ActionSender<Action>,
+    stepInfo: OnBoardingInfo.StepInfo
+) {
+    Column {
+        Text(
+            text = when (stepInfo.step) {
+                OnBoardingInfo.OnBoardingStep.SELECT_LANGUAGES -> "Select languages you want to learn"
+                OnBoardingInfo.OnBoardingStep.SIGN_UP -> "Create account and use all Langsapp features"
+                OnBoardingInfo.OnBoardingStep.FILL_PROFILE -> "Fill your profile information so that other users can get to know you"
+                OnBoardingInfo.OnBoardingStep.DOWNLOAD_CONTENT -> "Download content that you want to start learning"
+            },
+            modifier = Modifier.padding(8.dp)
+        )
+        TextButton(
+            onClick = {
+                when (stepInfo.step) {
+                    OnBoardingInfo.OnBoardingStep.SELECT_LANGUAGES -> actionSender.sendAction(
+                        HomeAction.SelectLanguagesTapped
+                    )
+
+                    OnBoardingInfo.OnBoardingStep.SIGN_UP -> actionSender.sendAction(
+                        HomeAction.SignUpTapped
+                    )
+
+                    OnBoardingInfo.OnBoardingStep.FILL_PROFILE -> actionSender.sendAction(
+                        HomeAction.UpsertProfileTapped
+                    )
+
+                    OnBoardingInfo.OnBoardingStep.DOWNLOAD_CONTENT -> actionSender.sendAction(
+                        HomeAction.DownloadContentTapped
+                    )
+                }
+            },
+            enabled = stepInfo.enabled
+        ) {
+            when (stepInfo.step) {
+                OnBoardingInfo.OnBoardingStep.SELECT_LANGUAGES -> Text("Select languages")
+                OnBoardingInfo.OnBoardingStep.SIGN_UP -> Text("Sign up")
+                OnBoardingInfo.OnBoardingStep.FILL_PROFILE -> Text("Fill profile")
+                OnBoardingInfo.OnBoardingStep.DOWNLOAD_CONTENT -> Text("Download content")
+            }
+        }
+    }
 }
 
 @Composable

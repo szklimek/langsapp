@@ -3,13 +3,18 @@ package com.langsapp.home.onboarding
 class OnBoardingInfo private constructor(
     val sections: List<OnBoardingSection>,
 ) {
-    val isFinished: Boolean =
+    val areRequiredStepsDone: Boolean =
         sections.none {
             (it.rootStep.required && !it.rootStep.done) ||
-                it.childSteps.any { stepInfo ->
-                    (stepInfo.required && !stepInfo.done)
-                }
+                    it.childSteps.any { stepInfo ->
+                        (stepInfo.required && !stepInfo.done)
+                    }
         }
+
+    val isCompleted: Boolean = sections.all {
+        it.rootStep.done &&
+                it.childSteps.all { stepInfo -> stepInfo.done }
+    }
 
     enum class OnBoardingStep {
         SELECT_LANGUAGES,
@@ -31,7 +36,10 @@ class OnBoardingInfo private constructor(
         val enabled: Boolean = true,
     )
 
-    data class OnBoardingSection(val rootStep: StepInfo, val childSteps: List<StepInfo> = emptyList())
+    data class OnBoardingSection(
+        val rootStep: StepInfo,
+        val childSteps: List<StepInfo> = emptyList()
+    )
 
     companion object {
         fun createForFreshUser(): OnBoardingInfo = OnBoardingInfo(
@@ -39,7 +47,11 @@ class OnBoardingInfo private constructor(
                 OnBoardingSection(
                     rootStep = StepInfo(OnBoardingStep.SELECT_LANGUAGES, required = true),
                     childSteps = listOf(
-                        StepInfo(step = OnBoardingStep.DOWNLOAD_CONTENT, required = true, enabled = false),
+                        StepInfo(
+                            step = OnBoardingStep.DOWNLOAD_CONTENT,
+                            required = true,
+                            enabled = false
+                        ),
                     ),
                 ),
                 OnBoardingSection(
@@ -70,7 +82,12 @@ class OnBoardingInfo private constructor(
         private fun OnBoardingInfo.markStepDone(step: OnBoardingStep) = OnBoardingInfo(
             sections = sections.map { section ->
                 when {
-                    section.rootStep.step == step -> section.copy(rootStep = section.rootStep.copy(done = true))
+                    section.rootStep.step == step -> section.copy(
+                        rootStep = section.rootStep.copy(
+                            done = true
+                        )
+                    )
+
                     else -> section.copy(
                         childSteps = section.childSteps.map {
                             if (it.step == step) {
@@ -87,7 +104,12 @@ class OnBoardingInfo private constructor(
         private fun OnBoardingInfo.markStepRequired(step: OnBoardingStep) = OnBoardingInfo(
             sections = sections.map { section ->
                 when {
-                    section.rootStep.step == step -> section.copy(rootStep = section.rootStep.copy(required = true))
+                    section.rootStep.step == step -> section.copy(
+                        rootStep = section.rootStep.copy(
+                            required = true
+                        )
+                    )
+
                     else -> section.copy(
                         childSteps = section.childSteps.map {
                             if (it.step == step) {
@@ -104,7 +126,12 @@ class OnBoardingInfo private constructor(
         private fun OnBoardingInfo.markStepEnabled(step: OnBoardingStep) = OnBoardingInfo(
             sections = sections.map { section ->
                 when {
-                    section.rootStep.step == step -> section.copy(rootStep = section.rootStep.copy(enabled = true))
+                    section.rootStep.step == step -> section.copy(
+                        rootStep = section.rootStep.copy(
+                            enabled = true
+                        )
+                    )
+
                     else -> section.copy(
                         childSteps = section.childSteps.map {
                             if (it.step == step) {
