@@ -15,6 +15,8 @@ sealed class HomeAction : Action {
     data object SelectLanguagesFinished : HomeAction()
     data object DownloadContentTapped : HomeAction()
     data object DownloadContentFinished : HomeAction()
+    data object CollapseOnboardingTapped : HomeAction()
+    data object ExpandOnboardingTapped : HomeAction()
     data object DevOptionsTapped : HomeAction()
     data class HomeDataLoaded(
         val userProfileInfo: CommonResult<UserProfileInfo, Unit>,

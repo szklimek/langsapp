@@ -2,6 +2,7 @@ package com.langsapp.home.onboarding
 
 class OnBoardingInfo private constructor(
     val sections: List<OnBoardingSection>,
+    val isCollapsed: Boolean = false,
 ) {
     val areRequiredStepsDone: Boolean =
         sections.none {
@@ -11,9 +12,19 @@ class OnBoardingInfo private constructor(
                     }
         }
 
-    val isCompleted: Boolean = sections.all {
-        it.rootStep.done &&
-                it.childSteps.all { stepInfo -> stepInfo.done }
+    fun getNumberOfStepsCompleted(): Int {
+        var completedStepsNumber = 0
+        sections.filter { it.rootStep.done }.forEach { _ -> completedStepsNumber++ }
+        sections.forEach { it ->
+            it.childSteps.forEach {
+                if (it.done) completedStepsNumber++
+            }
+        }
+        return completedStepsNumber
+    }
+
+    fun getNumberOfSteps(): Int {
+        return sections.size + sections.map { it.childSteps.size }.size
     }
 
     enum class OnBoardingStep {
@@ -78,6 +89,17 @@ class OnBoardingInfo private constructor(
                         OnBoardingStep.FILL_PROFILE -> it
                     }
                 }
+
+        fun OnBoardingInfo.collapsed(): OnBoardingInfo = OnBoardingInfo(
+            sections = sections,
+            isCollapsed = true,
+        )
+
+        fun OnBoardingInfo.expanded(): OnBoardingInfo = OnBoardingInfo(
+            sections = sections,
+            isCollapsed = false,
+        )
+
 
         private fun OnBoardingInfo.markStepDone(step: OnBoardingStep) = OnBoardingInfo(
             sections = sections.map { section ->

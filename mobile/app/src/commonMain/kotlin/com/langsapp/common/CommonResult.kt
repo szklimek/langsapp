@@ -18,6 +18,12 @@ sealed class CommonResult<SuccessType, FailureType> {
         }
     }
 
+    fun <T> mapSuccess(transform: (value: SuccessType) -> T): CommonResult<T, FailureType>
+    = when (this) {
+        is Success -> Success(transform(value))
+        is Failure -> Failure(error)
+    }
+
     fun getOrNull(): SuccessType? =
         when (this) {
             is Success -> value

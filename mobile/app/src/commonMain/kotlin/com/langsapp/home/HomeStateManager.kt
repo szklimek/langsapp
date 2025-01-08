@@ -4,6 +4,8 @@ import com.langsapp.architecture.ActionResult
 import com.langsapp.architecture.StateManager
 import com.langsapp.config.Log
 import com.langsapp.content.ManageContentState
+import com.langsapp.home.onboarding.OnBoardingInfo.Companion.collapsed
+import com.langsapp.home.onboarding.OnBoardingInfo.Companion.expanded
 import com.langsapp.home.onboarding.UserProfileInfo
 import com.langsapp.home.welcome.WelcomeSlide
 import com.langsapp.identity.IdentityState
@@ -123,6 +125,18 @@ class HomeStateManager(
 
             HomeAction.DevOptionsTapped -> ActionResult(
                 sideEffects = ArrayDeque(listOf(HomeNavigationSideEffect.DevOptions)),
+            )
+
+            HomeAction.CollapseOnboardingTapped -> ActionResult(
+                newState = (currentState as HomeState.Loaded).copy(
+                    onBoardingInfo = currentState.onBoardingInfo.mapSuccess { it.collapsed() }
+                )
+            )
+
+            HomeAction.ExpandOnboardingTapped -> ActionResult(
+                newState = (currentState as HomeState.Loaded).copy(
+                    onBoardingInfo = currentState.onBoardingInfo.mapSuccess { it.expanded() }
+                )
             )
         }
     },
